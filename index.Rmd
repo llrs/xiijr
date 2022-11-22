@@ -1,16 +1,19 @@
 ---
 title: "Los paquetes van a CRAN"
 author: '[Lluís Revilla Sancho](https://llrs.dev) <br>
+ .blue[
  [`r icons::fontawesome("square", "regular")`](https://user2021.llrs.dev) 
  [`r icons::fontawesome("github")`](https://github.com/llrs/xiijr/)
  [`r icons::fontawesome("mastodon")`](https://fosstodon.org/Lluis_Revilla) 
  [`r icons::fontawesome("twitter")`](https://twitter.com/Lluis_Revilla)
+ ]
   '
 output:
   xaringan::moon_reader:
-    css: ["useR-fonts"]
-    self_contained: true
+    css: ["useR-fonts", "default"]
+    self_contained: false
     nature:
+      beforeInit: "macros.js"
       ratio: 4:3
       highlightStyle: github
       highlightLines: true
@@ -42,8 +45,8 @@ theme_set(theme_slides)
 
 
 ```{r metathis, echo=FALSE}
-xaringanExtra::use_tile_view()
-xaringanExtra::use_share_again()
+# xaringanExtra::use_tile_view()
+# xaringanExtra::use_share_again()
 # https://www.garrickadenbuie.com/blog/sharing-xaringan-slides/
 library("metathis")
 meta() |>
@@ -55,7 +58,7 @@ meta() |>
       "Presentado en las XII Jornadas de R de Córdoba, 2022"
     ),
     url = "https://xiijr.llrs.dev",
-    image = "https://xiijr.llrs.dev/index_files/figure-html/title_slide_screenshot.png",
+    # image = "https://xiijr.llrs.dev/index_files/figure-html/title_slide_screenshot.png",
     image_alt = paste(
       "Image of the first slide for Reviewing packages; how does it work?", 
       "On the background a plot with the submissions to CRAN, horizontal axis the date, vertical axis the submissions on CRAN each line is a package on the submission queue. It shows a continuous increase on packages submitted (except some pauses).", 
@@ -615,28 +618,36 @@ deps_dates |>
 
 # Resumen
 
-- Prepararse bien
+.pull-left[
 
---
+- Prepararse bien
 
 - Mirar opciones
 
+- Saber que es una tarea larga
+
+]
+
 --
 
-- Saber que es una tarea larga
+.pull-right[
 
 .center[
 
-![:scale 20% "CRAN logo"](https://cran.r-project.org/CRANlogo.png)
+![:scale 40% "CRAN logo"](https://cran.r-project.org/CRANlogo.png)
+
+]
+
 ]
 
 --
 
 .center[
 
-Muchas gracias!
+**Muchas gracias!**
 
 Lluís Revilla Sancho
+
 [`r icons::fontawesome("github")`](https://github.com/llrs/xiijr/)
 [`r icons::fontawesome("twitter")`](https://twitter.com/Lluis_Revilla)
 

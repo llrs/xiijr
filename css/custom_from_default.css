@@ -1,3 +1,5 @@
+.blue { color: blue; }
+
 .remark-slide table {
   margin: auto;
   /* border-top: 1px solid #666; */
@@ -15,17 +17,17 @@
 /* https://bookdown.org/yihui/rmarkdown/xaringan-format.html#slides-and-properties */
 
 .title-slide {
-  background-image: 
-    url(../index_files/figure-html/useR_logo.png), 
-    url(../index_files/figure-html/title-plot-1.png), 
+  background-image:
+    url(../index_files/figure-html/useR_logo.png),
+    url(../index_files/figure-html/title-plot-1.png),
     linear-gradient(to bottom, white 85%, rgba(227, 227, 227) 95%);
-  background-position: 
-    5% 15%, 
-    top center,  
+  background-position:
+    5% 15%,
+    top center,
     center;
-  background-size: 
-    160px, 
-    100% 60% , 
+  background-size:
+    160px,
+    100% 60% ,
     cover;
 }
 /* From the useR.css
@@ -49,5 +51,5 @@ tr {background-color: #ffffff; }
   padding-right: 5%;
   padding-left: 5%;
   width: 100%;
-  height: 90%;  
+  height: 90%;
 }
