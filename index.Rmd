@@ -1,25 +1,35 @@
 ---
 title: "Los paquetes van a CRAN"
-author: '[Lluís Revilla Sancho](https://llrs.dev) <br>
- .blue[
- [`r icons::fontawesome("square", "regular")`](https://user2021.llrs.dev) 
- [`r icons::fontawesome("github")`](https://github.com/llrs/xiijr/)
- [`r icons::fontawesome("mastodon")`](https://fosstodon.org/Lluis_Revilla) 
- [`r icons::fontawesome("twitter")`](https://twitter.com/Lluis_Revilla)
- ]
-  '
+author: '[Lluís Revilla Sancho](https://llrs.dev)'
 output:
   xaringan::moon_reader:
     css: ["useR-fonts", "default"]
     self_contained: false
+    seal: false 
     nature:
       beforeInit: "macros.js"
       ratio: 4:3
       highlightStyle: github
       highlightLines: true
-      countIncrementalSlides: false
+      countIncrementalSlides: true
+      slideNumberFormat: "%current%"
+---
+class: title-slide, bottom
+
+# `r rmarkdown::metadata$title`
+
+### `r rmarkdown::metadata$author`
+
+[`r icons::fontawesome("square", "regular")`](https://user2021.llrs.dev) 
+[`r icons::fontawesome("github")`](https://github.com/llrs/xiijr/)
+[`r icons::fontawesome("mastodon")`](https://fosstodon.org/Lluis_Revilla) 
+[`r icons::fontawesome("twitter")`](https://twitter.com/Lluis_Revilla)
+
 ---
 name:intro
+<!-- class: title-slide -->
+<!-- background-image: -->
+
 # Introduction
 
 
@@ -45,8 +55,8 @@ theme_set(theme_slides)
 
 
 ```{r metathis, echo=FALSE}
-# xaringanExtra::use_tile_view()
-# xaringanExtra::use_share_again()
+xaringanExtra::use_tile_view()
+xaringanExtra::style_share_again(share_buttons = c("twitter", "linkedin", "reddit"))
 # https://www.garrickadenbuie.com/blog/sharing-xaringan-slides/
 library("metathis")
 meta() |>
@@ -72,15 +82,26 @@ meta() |>
 ```
 
 - R es uno de los pocos lenguajes en que los paquetes son revisados.
-- CRAN es uno de los dos repositorios oficiales.
+- [CRAN](https://cran.r-project.org) es uno de los dos repositorios oficiales.
+- Estoy en grupos de trabajo de [Bioconductor](https://bioconductor.org), en el de [R repository](https://github.com/RConsortium/r-repositories-wg) del [RConsortium](https://www.r-consortium.org/) y en la R contributors de la [R Foundation](https://www.r-project.org/foundation/)
 
+.center[
+[![:scale 15% "CRAN logo"](https://cran.r-project.org/CRANlogo.svg)](https://cran.r-project.org)
+![:scale 40% "Bioconductor logo"](https://www.bioconductor.org/images/logo/svg/bioconductor_logo_rgb.svg)
+![:scale 20% "rOpenSci"](https://raw.githubusercontent.com/ropensci/logos/master/icon_lettering_color.svg)
+]
 --
 
-1. Hay mucho contenido sobre cómo hacer un paquete 
 
-2. Enviar tu paquete a CRAN
+.center[
+
+0. Hay mucho contenido sobre cómo hacer un paquete 
+
+1. Enviar tu paquete a CRAN
    
-3. Mantener el paquete en CRAN
+2. Mantener el paquete en CRAN
+
+]
 
 
 ---
@@ -202,7 +223,7 @@ approval_dates <- function(start, end, package, li) {
   }
 }
 
-if (!file.exists("output/CRAN_archival_dates.RDS")){
+if (!file.exists("output/CRAN_archival_dates.RDS")) {
   cran_dates <- lapply(unique(cran_submissions$package),
                        function(x){
                          y <- tryCatch(pkgsearch::cran_package_history(x), 
@@ -250,7 +271,7 @@ success_submissions <- ap |>
   scale_color_viridis_d() +
   scale_linewidth_continuous(trans = "log10", breaks = c(1, 10, 100, 1000), 
                   labels = c("1", "10", "100", "1000"), limits = c(1, 1000)) +
-  theme(legend.position = c(0.8, 0.8))
+  theme(legend.position = "bottom")
   
 success_dates <- ap0 |> 
   group_by(submission = lubridate::floor_date(start, "day"), new) |>
@@ -276,13 +297,14 @@ success_dates <- ap0 |>
                   labels = c("1", "10", "100", "1000"), limits = c(1, 1000)) +
   coord_cartesian(ylim = c(0.6, 1)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
-        legend.position = c(0.65, 0.3)) +
+        legend.position = "bottom") +
   labs(col = "Solicitudes", title = "Ratio de acceptación", 
        subtitle = "Media móvil de 45 días",
        x = element_blank(), linetype = "Tipo", y = element_blank(),
        linewidth = "Paquetes")
 	
-success_submissions + success_dates + plot_layout(guides = "collect")
+success_submissions + success_dates + plot_layout(guides = "collect") &
+  theme(legend.position = "bottom")
 ```
 
 ---
@@ -620,11 +642,11 @@ deps_dates |>
 
 .pull-left[
 
-- Prepararse bien
+- Preparar bien el paquete
 
 - Mirar opciones
 
-- Saber que es una tarea larga
+- Conocer las implicaciones
 
 ]
 
@@ -633,9 +655,10 @@ deps_dates |>
 .pull-right[
 
 .center[
+.middle[
 
-![:scale 40% "CRAN logo"](https://cran.r-project.org/CRANlogo.png)
-
+[![:scale 50% "CRAN logo"](https://cran.r-project.org/CRANlogo.png)](https://cran.r-project.org)
+]
 ]
 
 ]
@@ -644,13 +667,16 @@ deps_dates |>
 
 .center[
 
+.middle[
+
 **Muchas gracias!**
 
 Lluís Revilla Sancho
 
-[`r icons::fontawesome("github")`](https://github.com/llrs/xiijr/)
 [`r icons::fontawesome("twitter")`](https://twitter.com/Lluis_Revilla)
+[`r icons::fontawesome("github")`](https://github.com/llrs/xiijr/)
 
+]
 ]
 
 

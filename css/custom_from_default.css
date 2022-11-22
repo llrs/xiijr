@@ -1,5 +1,9 @@
 .blue { color: blue; }
 
+svg {
+  color: blue;
+}
+
 .remark-slide table {
   margin: auto;
   /* border-top: 1px solid #666; */
@@ -15,6 +19,23 @@
 
 
 /* https://bookdown.org/yihui/rmarkdown/xaringan-format.html#slides-and-properties */
+
+/*-- NHS organisation logo --*/
+.title-slide {
+  /*-- background-image:    url(../img/logo-title-slide.png); --*/
+  background-position: 95% 10%;
+  background-size:     300px;
+}
+/*-- Headings --*/
+.title-slide h1 {
+  color:               #000000;
+}
+/*-- Hides slide number from title slide --*/
+.title-slide .remark-slide-number {
+  display:             none;
+}
+
+
 
 .title-slide {
   background-image:
