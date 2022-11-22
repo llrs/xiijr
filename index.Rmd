@@ -1,0 +1,660 @@
+---
+title: "Los paquetes van a CRAN"
+author: '[Lluís Revilla Sancho](https://llrs.dev) <br>
+ [`r icons::fontawesome("square", "regular")`](https://user2021.llrs.dev) 
+ [`r icons::fontawesome("github")`](https://github.com/llrs/xiijr/)
+ [`r icons::fontawesome("mastodon")`](https://fosstodon.org/Lluis_Revilla) 
+ [`r icons::fontawesome("twitter")`](https://twitter.com/Lluis_Revilla)
+  '
+output:
+  xaringan::moon_reader:
+    css: ["useR-fonts"]
+    self_contained: true
+    nature:
+      ratio: 4:3
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+name:intro
+# Introduction
+
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, 
+                      cache = TRUE,
+                      warning = FALSE, fig.align = "center", 
+                      fig.height = 6, fig.width = 11, fig.retina = 3)
+
+library("tidyverse")
+library("lubridate")
+library("patchwork")
+library("ggrepel")
+library("slider")
+
+theme_slides <- theme_minimal() +
+  theme(text = element_text(size = 16))
+theme_set(theme_slides)
+# https://pkg.garrickadenbuie.com/xaringanExtra/#/slide-tone
+# xaringanExtra::use_slide_tone() # Not useful
+# Icons from: https://github.com/mitchelloharawild/icons
+```
+
+
+```{r metathis, echo=FALSE}
+xaringanExtra::use_tile_view()
+xaringanExtra::use_share_again()
+# https://www.garrickadenbuie.com/blog/sharing-xaringan-slides/
+library("metathis")
+meta() |>
+  meta_name("github-repo" = "llrs/xiijr") |>
+  meta_social(
+    title = "Los paquetes van a CRAN",
+    description = paste(
+      "Presentación sobre qué hay que hacer para que los paquetes vayan a CRAN",
+      "Presentado en las XII Jornadas de R de Córdoba, 2022"
+    ),
+    url = "https://xiijr.llrs.dev",
+    image = "https://xiijr.llrs.dev/index_files/figure-html/title_slide_screenshot.png",
+    image_alt = paste(
+      "Image of the first slide for Reviewing packages; how does it work?", 
+      "On the background a plot with the submissions to CRAN, horizontal axis the date, vertical axis the submissions on CRAN each line is a package on the submission queue. It shows a continuous increase on packages submitted (except some pauses).", 
+      "Presentado en las XII Jornadas de R de Córdoba, 2022 por Lluís Revilla"
+    ),
+    og_type = "website",
+    og_author = "Lluís Revilla",
+    twitter_card_type = "summary_large_image",
+    twitter_creator = "@Lluis_Revilla"
+  )
+```
+
+- R es uno de los pocos lenguajes en que los paquetes son revisados.
+- CRAN es uno de los dos repositorios oficiales.
+
+--
+
+1. Hay mucho contenido sobre cómo hacer un paquete 
+
+2. Enviar tu paquete a CRAN
+   
+3. Mantener el paquete en CRAN
+
+
+---
+name:status
+
+# Estado actual
+
+```{r cdh}
+if (!file.exists("output/cdh.RDS")) {
+  cdh <- cransays::download_history()
+  saveRDS(cdh, "output/cdh.RDS")
+} else {
+  cdh <- readRDS("output/cdh.RDS")
+}
+
+diff0 <- structure(0, class = "difftime", units = "hours")
+cran_submissions <- cdh |>
+  arrange(package, version, snapshot_time) |> 
+  group_by(package) |>
+  # Packages last seen in queue less than 24 ago are considered same submission
+  mutate(diff_time = difftime(snapshot_time,  lag(snapshot_time), units = "hour"),
+         diff_time = if_else(is.na(diff_time), diff0, diff_time), # Fill NAs
+         diff_v = version != lag(version),
+         diff_v = ifelse(is.na(diff_v), TRUE, diff_v), # Fill NAs
+         near_t = abs(diff_time) <= 24,
+         resubmission = !near_t | diff_v, 
+         resubmission = if_else(resubmission == FALSE & diff_time == 0, 
+                               TRUE, resubmission),
+         resubmission_n = cumsum(as.numeric(resubmission)),
+         new_version = !near_t & diff_v, 
+         new_version = if_else(new_version == FALSE & diff_time == 0, 
+                               TRUE, new_version),
+         submission_n = cumsum(as.numeric(new_version))) |>
+  ungroup() |>
+  select(-diff_time, -diff_v, -new_version, -resubmission)
+cran_times <- cran_submissions |> 
+  mutate(date = as_date(snapshot_time),
+         week = week(snapshot_time),
+         mday = mday(snapshot_time),
+         wday = wday(snapshot_time, locale = "en_GB.UTF-8", 
+                     week_start = 1,
+                     label = FALSE))
+submission_folders <- cran_times |>
+  group_by(package, resubmission_n, submission_n) |> 
+  count(folder) |> 
+  pivot_wider(names_from = folder, values_from = n, values_fill = 0) |> 
+  ungroup()
+
+submission_folders_total <- cran_times |>
+  group_by(package, resubmission_n, submission_n) |> 
+  count(folder) |> 
+  summarize(h = sum(n)) |> 
+  ungroup()
+submissions_times <- cran_times |> 
+  group_by(package, resubmission_n, submission_n) |> 
+  summarize(start = min(snapshot_time), end = max(snapshot_time),
+            .groups = "drop") 
+rsubm <- full_join(submission_folders, submission_folders_total) |> 
+  full_join(submissions_times)
+subm_time <- rsubm |> 
+  group_by(package, submission_n) |> 
+  summarize(d = as.Date(min(start)),
+         new = ifelse(any(newbies != 0), "Nuevo", "Actualización"),
+         h = sum(h), .groups = "drop") |>
+  group_by(d, new) |> 
+  summarize(m = median(h),
+            n = n()) 
+fdates <- function(x) {
+  seq_days <- seq(from = min(x), to = max(x), by = 86400)
+  keep_days <- mday(seq_days) %in% c(1, 7, 14, 21)
+  breaks_dates <- seq_days[keep_days]
+  floor_date(breaks_dates, unit = "days")
+}
+
+rolling_median <- subm_time |> 
+  group_by(new) |> 
+  arrange(d) |> 
+  mutate(m_rolling = slide_dbl(.x = m, .f = median, .before = 45, .complete = FALSE)) |> 
+  ungroup()
+  
+rolling_median |> 
+  ungroup() |> 
+  ggplot() +
+  # geom_smooth(aes(d, m, col = new, weight = n, group = new, linewidth = n), span = 0.2) +
+  geom_line(aes(d, m_rolling, col = new, linewidth = n), lineend = "round") +
+    geom_hline(aes(yintercept = time, col = new), data = . %>% group_by(new) %>% summarise(time = median(m_rolling, na.rm = TRUE), .groups = "drop"),
+               linetype = "dashed", alpha = 0.5) +
+  coord_cartesian(ylim = c(0, NA)) +
+  scale_color_viridis_d() +
+  scale_x_date(expand = expansion()) +
+  scale_y_continuous(expand = expansion()) +
+  scale_linewidth(breaks = c(10, 50, 100, 150)) +
+  labs(x = element_blank(), y = "Hours", linewidth = "Paquetes",
+       title = "Timepo en la cola",
+       subtitle = "Horas de mediana por cada 45 días", col = "Tipo",
+       caption = "Lluís Revilla") +
+  theme(legend.position = c(0.8, 0.7))
+```
+
+---
+
+name:success-submissions
+# Exitoso?
+
+```{r cran_success, fig.alt="On the left a bar plot with packages submissions to CRAN on the x axis and on the vertical axis the number of pacakges. The bars are colored by if they are accepted or not. It is also split by new packages and updated pacakges. More new pacakges are not accepted on the first try than updates, but on resubmissions they are accepted. The plot on the right shows the acceptance rate of CRAN for the range of dates from 2020/09 to 2021/06. Two lines with one for new submissions which shows a consistend rate around 81% and package updates is between 85% and 95% (until the time series get to close for the review to be finished)."}
+approval_dates <- function(start, end, package, li) {
+  dates <- li[[package]]
+  dates <- dates[!is.na(dates)] # Too old packages don't have date
+  if (is.logical(dates)) {
+    return(NA)
+  }
+  
+  diff_de <- difftime(dates, end, units = "day")
+  r <- dates[abs(diff_de) <= 1]
+  if (length(r) >= 1) {
+    return(min(r))
+  } else {
+    return(NA)
+  }
+}
+
+if (!file.exists("output/CRAN_archival_dates.RDS")){
+  cran_dates <- lapply(unique(cran_submissions$package),
+                       function(x){
+                         y <- tryCatch(pkgsearch::cran_package_history(x), 
+                                       error = function(e){FALSE})
+                         if (!isFALSE(y)) {
+                           z <- y$`Date/Publication`
+                           a <- z[!is.na(z)]
+                           return(as_datetime(z))
+                         } else {
+                           return(NA)
+                         }
+                       })
+  names(cran_dates) <- unique(cran_submissions$package)
+  saveRDS(cran_dates, "output/CRAN_archival_dates.RDS")
+} else {
+  cran_dates <- readRDS("output/CRAN_archival_dates.RDS")
+}
+
+
+ap0 <- rsubm |> 
+  group_by(package, submission_n) |> 
+  summarize(start = min(start),
+            end = max(end),
+            new = ifelse(any(newbies != 0), "Nuevo", "Actualización"),
+            accepted = approval_dates(start, end, unique(package), cran_dates),
+            .groups = "drop")
+
+ap <-  ap0 |> 
+  group_by(submission_n, new) |> 
+  count(Accepted = !is.na(accepted)) |> 
+  ungroup()
+
+success_submissions <- ap |> 
+  group_by(submission_n, new) |> 
+  mutate(p = n/sum(n)) |> 
+  ungroup() |> 
+  filter(Accepted) |> 
+  ggplot() + 
+  geom_line(aes(x = submission_n, y = p, col = new, linewidth = n), lineend = "round") +
+  labs(x = "Solicitudes", y = "Success rate", title = "Solicitudes exitosas", 
+       col = "Solicitudes", linetype = "Solicitudes", 
+       linewidth = "Paquetes") +
+  scale_y_continuous(expand = expansion(), limits = c(0, 1), labels = scales::percent) +
+  scale_x_continuous(expand = expansion(), limits = c(1, 75)) +
+  scale_color_viridis_d() +
+  scale_linewidth_continuous(trans = "log10", breaks = c(1, 10, 100, 1000), 
+                  labels = c("1", "10", "100", "1000"), limits = c(1, 1000)) +
+  theme(legend.position = c(0.8, 0.8))
+  
+success_dates <- ap0 |> 
+  group_by(submission = lubridate::floor_date(start, "day"), new) |>
+  count(Accepted = !is.na(accepted)) |> 
+  mutate(perc = n/sum(n),
+         n_total = sum(n)) |> 
+  ungroup() |> 
+  filter(Accepted) |> 
+  group_by(new) |> 
+  arrange(submission, new) |> 
+  mutate(p_rolling = slide_dbl(.x = perc, .f = function(x){median(x, na.rm = TRUE)}, .before = 45, .complete = FALSE)) |> 
+  ungroup() |> 
+  ggplot() + 
+  # geom_line(aes(submission, perc, col = new, linewidth = n))
+  geom_line(aes(submission, p_rolling, col = new, linewidth = n_total), 
+            lineend = "round") +
+  # geom_smooth(aes(submission, perc, linetype = new), span = 0.5) +
+  scale_y_continuous(expand = expansion(), labels = scales::percent) +
+  scale_x_datetime(date_labels = "%y/%m", date_breaks = "2 month", minor_breaks = NULL,
+                   expand = expansion()) +
+  scale_color_viridis_d() +
+  scale_linewidth(trans = "log10", breaks = c(1, 10, 100, 1000), 
+                  labels = c("1", "10", "100", "1000"), limits = c(1, 1000)) +
+  coord_cartesian(ylim = c(0.6, 1)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = c(0.65, 0.3)) +
+  labs(col = "Solicitudes", title = "Ratio de acceptación", 
+       subtitle = "Media móvil de 45 días",
+       x = element_blank(), linetype = "Tipo", y = element_blank(),
+       linewidth = "Paquetes")
+	
+success_submissions + success_dates + plot_layout(guides = "collect")
+```
+
+---
+
+# Evolucion histórica
+
+```{r ev-historica}
+#| fig.alt = "Modelizaje del tiempo entre contruir el paquete y que sea publicado en CRAN."
+
+if (!file.exists("output/archive.RDS")) {
+  archive <- tools:::CRAN_archive_db()
+  saveRDS(archive, "output/archive.RDS")
+} else {
+  archive <- readRDS("output/archive.RDS")
+}
+if (!file.exists("output/packages.RDS")) {
+  packages <- tools::CRAN_package_db()
+  saveRDS(packages, "output/packages.RDS")
+} else {
+  packages <- readRDS("output/packages.RDS")
+}
+df <- data.frame(major = integer(), minor = integer(), patch = integer())
+library("rversions")
+r_versions <- r_versions() |> 
+  mutate(date = as.Date(date),
+         strcapture("([0-9])\\.([0-9]*)\\.?([0-9]*)", 
+                    version, proto = df),
+         equal = major == lag(major, default = TRUE) & minor == lag(minor, default = TRUE))
+minor_changes0 <- filter(r_versions, !equal)
+packages$Published <- as.Date(packages$Published, format = "%Y-%m-%d",
+                              tz = "UTC")
+packages$Packaged_by <- gsub(".*; (.*)", "\\1", packages$Packaged)
+packages$Packaged <- as.POSIXct(packages$Packaged, 
+                                format = "%Y-%m-%d %H:%M:%S", tz = "UTC")
+packages2 <- packages |> 
+  mutate(date =  as.Date(Packaged),
+         diff = round(difftime(Published, date, units = "days"), 0)) |> 
+  mutate(with_archives = Package %in% names(archive)) |> 
+  distinct(Package, .keep_all = TRUE)
+minor_changes <- filter(minor_changes0, date >= min(packages2$date, 
+                                                    na.rm = TRUE))
+yesno <- function(x) {
+  k <- x
+  k[x] <- "Yes"
+  k[!x] <- "No"
+  k
+}
+library("ggrepel")
+packages2 |> 
+  arrange(date) |> 
+  select(date, diff, with_archives) |> 
+  ggplot() +
+  geom_smooth(aes(date, diff, col = ifelse(!with_archives, "Nuevo", "Actualización"), 
+             linetype = ifelse(!with_archives, "Nuevo", "Actualización")), span = "45 days") +
+  geom_text_repel(aes(x = date, y = 7, label = version),
+                  data = minor_changes, nudge_x = 0, angle = 90) +
+  scale_y_continuous(expand = expansion()) +
+  scale_x_date(date_breaks = "2 years", date_labels = "%Y", 
+               expand = expansion(add = 0.5)) +
+  scale_color_viridis_d() +
+  coord_cartesian(ylim =  c(0, NA)) +
+  labs(y = "Tiempo en procesar (días)", 
+       x = element_blank(),
+       col = "Tipo",
+       linetype = "Tipo",
+       title = "Tiempo entre armar el paquete y su publicación en CRAN") +
+  theme(legend.position = c(0.7, 0.7))
+```
+
+---
+
+
+
+```{r current}
+archive_df <- do.call("rbind", archive)
+if (!file.exists("output/current.RDS")) {
+  current <- tools:::CRAN_current_db()
+  saveRDS(current, "output/current.RDS")
+} else {
+  current <- readRDS("output/current.RDS")
+}
+archives <- vapply(archive, nrow, numeric(1))
+pkg <- rep(names(archive), times = archives)
+archive_df$package <- pkg
+
+version <- gsub(".*_(.*)\\.tar\\.gz$", "\\1", rownames(archive_df))
+archive_df$version <- version
+archive_df$version[archive_df$version == archive_df$package] <- NA
+archive_df$status <- "archived"
+
+# Make sure they match
+current$package <- rownames(current)
+current$version <- packages$Version[match(current$package, packages$Package)]
+current$status <- "available"
+all_packages <- rbind(archive_df, current)
+
+# Arrange dates and data
+all_packages$mtime <- with_tz(all_packages$mtime, tzone = "UTC")
+keep_columns <- c("package", "mtime", "version", "uname", "size", "status")
+all_packages2 <- all_packages[, keep_columns] |> 
+  mutate(date = as.Date(mtime)) |> 
+  select(-mtime) |> 
+  arrange(package, date) |> 
+  group_by(package) |> 
+  mutate(trelative = difftime(date, min(date), units = "weeks"),
+         tprevious = trelative - lag(as.numeric(trelative), default = 0),
+         n = n(),
+         release = 1:n(),
+         available = yesno(any(status == "available"))) |> 
+  ungroup()
+
+# Update with slider. 
+type_updates <- all_packages2 |> 
+  group_by(year = floor_date(date, "year"), package) |> 
+  summarise(type = case_when(any(release == 1) & any(release > 1) ~ "Nuevo & actualizado",
+                             any(release > 1) ~ "Actualización",
+                             release == 1 ~ "Nuevo",
+                             TRUE ~ "Actualización"),
+            n = n()) |> 
+  ungroup() |> 
+  distinct(.keep_all = TRUE) |> 
+  group_by(year) |> 
+  count(type, name = "packages") |> 
+  mutate(prop = packages/sum(packages)) |> 
+  ungroup()
+## `summarise()` has grouped output by 'year', 'package'. You can override using
+## the `.groups` argument.
+
+# type_updates |> 
+#   ggplot() +
+#   geom_col(aes(year, packages, fill = type), position = "stack") +
+#   scale_x_date(date_breaks = "2 years", date_labels = "%Y", 
+#                expand = expansion()) +
+#   scale_y_continuous(expand = expansion()) +
+#   theme_minimal() +
+#   labs(title = "Packages news on CRAN",
+#        x = element_blank(),
+#        y = element_blank(),
+#        fill = "Type") +
+#   theme(legend.position = c(0.2, 0.75), plot.title.position = "plot")
+```
+
+
+# Los nuevos paquetes
+
+```{r nuevos}
+type_updates |> 
+  filter(type != "Actualización") |> 
+  ggplot() +
+  geom_col(aes(year, packages, fill = type), position = "stack") +
+  scale_x_date(date_breaks = "2 years", date_labels = "%Y", 
+               expand = expansion()) +
+  scale_y_continuous(expand = expansion()) +
+  scale_fill_manual(values = c("Nuevo" = "#F8766D", "Nuevo & actualizado" = "#00BA38")) +
+  labs(title = "Los nuevos paquetes en CRAN",
+       x = element_blank(),
+       y = element_blank(),
+       fill = "Tipo") +
+  scale_fill_viridis_d() +
+  theme(legend.position = c(0.2, 0.75), plot.title.position = "plot")
+```
+
+---
+
+# Actualizaciones
+
+```{r actualizados}
+a <- all_packages2 |> 
+  group_by(package) |> 
+  summarize(n = n_distinct(release)) |> 
+  count(n) |>  
+  mutate(p = nn/sum(nn)) |> 
+  filter(n == 1)
+```
+
+El `r scales::percent(1-a$p)` de los paquetes de CRAN han tenido alguna
+
+--
+
+```{r time_version}
+block <- all_packages2 |> 
+  filter(release != 1) |> 
+  group_by(month = floor_date(date, "month"),
+           release) |> 
+  summarise(t = median(tprevious),
+            n = n()) |> 
+  ungroup() 
+
+block |> 
+  filter(release <= 6) |> 
+  ggplot() +
+  geom_smooth(aes(month, t, col = as.factor(release),
+                  linetype = as.factor(release), weight = n), 
+              alpha = 0.25)  +
+  scale_x_date(expand = expansion(), date_breaks = "2 year", date_labels = "%Y") +
+  scale_y_continuous(expand = expansion(),
+                     sec.axis = sec_axis( ~ ./52, name = "Años"),
+                     limits = c(0, NA)) +
+  scale_color_viridis_d() +
+  labs(x = element_blank(),
+       y = "Tiempo medio desde la anterior actualización (semanas)",
+       title = "Velocidad de las actualizaciones",
+       subtitle = "Versión <= 6",
+       col = "Versión",
+       linetype = "Versión") +
+    theme(legend.position = c(0.4, 0.8), legend.direction = "horizontal")
+```
+
+
+
+---
+
+
+```{r dependencias}
+direct_dep <- tools::package_dependencies(packages2$Package, 
+                                          db = packages2)
+never_archived <- all_packages2 |> 
+  filter(available == "Yes", n == 1) |> 
+  pull(package)
+base_packages <- rownames(installed.packages(priority = "base"))
+deps0 <- vapply(direct_dep, function(x){sum(!x %in% base_packages)}, numeric(1L))
+deps <- lengths(direct_dep)
+recurs_dep <- tools::package_dependencies(packages2$Package,
+                                          db = packages2, recursive = TRUE)
+r_deps0 <- vapply(recurs_dep, function(x){sum(!x %in% base_packages)}, numeric(1L))
+
+
+p <- all_packages2 |> 
+  group_by(package) |> 
+  summarize(first_release = min(date),
+            last_release = max(date),
+            releases = n())
+
+r_deps <- lengths(recurs_dep)
+r_deps <- r_deps0[names(deps0)]
+deps_all <- data.frame(direct_deps = deps0,
+                       r_deps)
+deps_all$Package <- rownames(deps_all)
+
+rle_weeks <- function(x, y) {
+  # Wait two months (8 weeks) to have established package
+  x <- x[y > 8]
+  rle <- rle(x < 4)
+  # Count if there are more than two updates in a month.
+  rle$lengths[rle$values ] >= 2
+}
+packages_updates <- all_packages2 |>
+  filter(n > 1, available == "Yes") |>
+  group_by(package) |>
+  summarise(d = min(date),
+            diff_time = as.numeric(difftime(Sys.Date(), d), units = "weeks"),
+            releases = unique(n),
+            update_rate = releases/diff_time,
+  					frequent_releases = yesno(any(update_rate >= 1/8)),
+  					quick_releases = yesno(any(rle_weeks(tprevious, trelative)))) |>
+	ungroup() |>
+	filter(diff_time > 8) # Give 8 weeks since first release
+pu <- packages_updates |>
+        mutate(type = case_when(
+        quick_releases == "Yes" & frequent_releases == "Yes" ~ "Quick & frequent",
+        quick_releases == "Yes" & frequent_releases == "No" ~ "Quick",
+        quick_releases == "No" & frequent_releases == "Yes" ~ "Frequent",
+        quick_releases == "No" & frequent_releases == "No" ~ "Ideal",
+        TRUE ~ "weird")) |>
+    mutate(type = fct_relevel(type, c("Quick & frequent", "Quick", "Frequent", "Ideal"))) |>
+    select(Package = package, date = d, type, releases)
+
+
+da <- merge(deps_all, pu, all = TRUE) |>
+    mutate(archived = yesno(!Package %in% never_archived)) |>
+    rename(first_release = date)
+pp <- da$Package[is.na(da$first_release)]
+da[is.na(da$first_release), c("first_release", "last_release", "releases")] <- 
+  p[match(pp, p$package), c("first_release", "last_release", "releases")]
+da$type[is.na(da$type) & da$releases == 1] <- "Ideal"
+```
+
+
+```{r dependencias2}
+dates_deps <- function(dependencies, dates, base_packages = NULL) {
+  if (is.null(base_packages)) {
+    base_packages <- rownames(installed.packages(priority = "base"))
+  }
+  deps <- dependencies[!dependencies %in% base_packages]
+  d <- dates[deps]
+  if (length(d) == 0) {
+    return(data.frame(oldest = NA_Date_, median = NA_Date_, 
+                                        youngest = NA_Date_, sd = NA_Date_, n = 0))
+  }
+  data.frame(oldest = min(d, na.rm = TRUE), 
+             median = median(d, na.rm = TRUE), 
+             youngest = max(d, na.rm = TRUE),
+                     sd = as.Date(sd(d), origin = "1900-01-01"),
+             n = length(d))
+}
+first_release_dates <- all_packages2 |> 
+  group_by(package) |> 
+  summarise(date = min(date))
+dates <- first_release_dates$date
+names(dates) <- first_release_dates$package
+l <- lapply(direct_dep, dates_deps, dates, base_packages)
+```
+
+
+# Las dependencias!
+
+```{r plot-dependencias}
+# First date of release of a package and current date of publication of packages
+deps_dates <- do.call("rbind", l) 
+deps_dates$package <- names(direct_dep)
+deps_dates <- left_join(deps_dates, da, 
+                        by = c("package" = "Package")) |> 
+  pivot_longer(cols = c(youngest, median, oldest))
+deps_dates |> 
+  mutate(difftime = as.numeric(difftime(last_release, value, units = "weeks"))/52,
+             with_archives = yesno(releases == 1)) |> 
+    filter(!is.na(difftime)) |> 
+  ggplot() +
+  geom_smooth(aes(last_release, difftime, col = name)) +
+  geom_abline(slope = 1/52, intercept = 0) +
+  scale_y_continuous(sec.axis = dup_axis(), limits = c(0, NA), expand = expansion()) +
+  scale_x_date(expand = expansion()) +
+  scale_color_viridis_d() +
+  labs(x = element_blank(),
+       y = "Años de diferencia",
+       col = "Dependencia",
+       title = "Cambia tu paquete y tus dependencias") +
+  theme(panel.spacing = unit(1, "lines"), legend.position = c(0.4, 0.8), 
+            legend.direction = "horizontal")
+```
+
+---
+
+# Resumen
+
+- Prepararse bien
+
+--
+
+- Mirar opciones
+
+--
+
+- Saber que es una tarea larga
+
+.center[
+
+![:scale 20% "CRAN logo"](https://cran.r-project.org/CRANlogo.png)
+]
+
+--
+
+.center[
+
+Muchas gracias!
+
+Lluís Revilla Sancho
+[`r icons::fontawesome("github")`](https://github.com/llrs/xiijr/)
+[`r icons::fontawesome("twitter")`](https://twitter.com/Lluis_Revilla)
+
+]
+
+
+```{r qa-checking, eval=FALSE, include=FALSE}
+ct <- cran_times |> group_by(package, version) |> summarize(start = min(date), end = max(date))
+
+ad <- all_packages |> 
+  mutate(date = as.Date(mtime)) |> 
+  select(package, version, date)
+rownames(ad) <- NULL
+
+ct_ad <- merge(ct, ad, all.y = TRUE, all.x = FALSE) |> 
+  arrange(date)
+ct_ad |> filter(date >= min(start, na.rm = TRUE)) |> 
+  summarise(missing = sum(is.na(start) & is.na(end), na.rm = TRUE),
+            n = n())
+```
+
