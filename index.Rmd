@@ -355,7 +355,7 @@ success_dates <- ap0 |>
   coord_cartesian(ylim = c(0.6, 1)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         legend.position = "bottom") +
-  labs(col = "Solicitudes", title = "Ratio de acceptación", 
+  labs(col = "Solicitudes", title = "Ratio de aceptación", 
        subtitle = "Media móvil de 45 días",
        x = element_blank(), linetype = "Tipo", y = element_blank(),
        linewidth = "Paquetes")
