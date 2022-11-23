@@ -5,7 +5,7 @@ lang: es
 date: 2022/11/25
 output:
   xaringan::moon_reader:
-    css: ["useR-fonts", "default"]
+    css: ["useR-fonts", "default", "css/custom_from_default.css" ]
     self_contained: false
     seal: false 
     nature:
@@ -17,7 +17,8 @@ output:
       slideNumberFormat: "%current%"
 ---
 class: title-slide, bottom
-
+background-image: url("img/kira-auf-der-heide-LXy2DOOxESQ-unsplash.jpg")
+background-size: contain
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, 
@@ -95,10 +96,9 @@ meta() |>
   )
 ```
 
+# .blue[`r rmarkdown::metadata$title`]
 
-# `r rmarkdown::metadata$title`
-
-.center[`r rmarkdown::metadata$date`]
+.blue[.center[**`r rmarkdown::metadata$date`**]]
 
 .right[
 
@@ -111,7 +111,7 @@ meta() |>
 
 ---
 name:intro
-# Introduction
+# Introducción
 
 
 - R es uno de los pocos lenguajes en que los paquetes son revisados.
@@ -135,9 +135,9 @@ También hay ciertas comprovaciones con diferentes versiones de R y con diferent
 
 .center[
 
-0. Hay mucho contenido sobre cómo hacer un paquete 
+0. Hay [mucho contenido](https://r-pkgs.org) sobre [cómo hacer](https://hilaryparker.com/2014/04/29/writing-an-r-package-from-scratch/) un [paquete](https://kbroman.org/pkg_primer/). 
 
-1. Enviar tu paquete a CRAN
+1. [Enviar tu paquete a CRAN](https://search.r-project.org/CRAN/refmans/devtools/html/release.html)
    
 2. Mantener el paquete en CRAN
 
@@ -147,7 +147,9 @@ También hay ciertas comprovaciones con diferentes versiones de R y con diferent
 
 Para ver cómo hacer un paquete a parte del libro [R packages](https://r-pkgs.org), 
 
-Para enviar a CRAN, hay algunas listas, [de CRAN](https://cran.r-project.org/web/packages/submission_checklist.html), [de ThinkR](https://github.com/ThinkR-open/prepare-for-cran), también está mi [sesión en useR2021](https://llrs.dev/talk/user-2021/) que és más sobre qué sucede al enviarlo. 
+Para enviar a CRAN, hay algunas listas, [de CRAN](https://cran.r-project.org/web/packages/submission_checklist.html), [de ThinkR](https://github.com/ThinkR-open/prepare-for-cran), también está mi [sesión en useR2021](https://llrs.dev/talk/user-2021/) que és más sobre qué sucede al enviarlo.
+Para enviarlo en sí, se [puede hacer desde aquí](https://cran.r-project.org/submit.html), aunque se puede enviar mediante [`devtools::release()`](https://search.r-project.org/CRAN/refmans/devtools/html/release.html)
+
 El inicio de esta presentación y esa es similar.
 
 Para mantener el paquete en CRAN hay algun contenido en diferentes blogs, cómo por ejemplo del [R-hub](https://blog.r-hub.io/) y de [rOpenSci](https://ropensci.org/blog/).
@@ -728,8 +730,6 @@ Esto ayuda a evitar problemas con las comprobaciones automáticas diarias de los
 Evita aquello que puedas hacer tu, separa lo importante de lo bonito, si puedes incluye solo como dependencia sugerida sino cómo importado y en último recurso cómo dependencia. 
 
 ---
-
-
 
 # Resumen
 
