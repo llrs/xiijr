@@ -1,6 +1,8 @@
 ---
 title: "Los paquetes van a CRAN"
 author: '[Lluís Revilla Sancho](https://llrs.dev)'
+lang: es
+date: 2022/11/25
 output:
   xaringan::moon_reader:
     css: ["useR-fonts", "default"]
@@ -15,22 +17,6 @@ output:
       slideNumberFormat: "%current%"
 ---
 class: title-slide, bottom
-
-# `r rmarkdown::metadata$title`
-
-### `r rmarkdown::metadata$author`
-
-[`r icons::fontawesome("square", "regular")`](https://user2021.llrs.dev) 
-[`r icons::fontawesome("github")`](https://github.com/llrs/xiijr/)
-[`r icons::fontawesome("mastodon")`](https://fosstodon.org/Lluis_Revilla) 
-[`r icons::fontawesome("twitter")`](https://twitter.com/Lluis_Revilla)
-
----
-name:intro
-<!-- class: title-slide -->
-<!-- background-image: -->
-
-# Introduction
 
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
@@ -53,10 +39,38 @@ theme_set(theme_slides)
 # Icons from: https://github.com/mitchelloharawild/icons
 ```
 
+```{r tile, echo=FALSE}
+xaringanExtra::use_tile_view()
+```
+
+
+```{r share, echo=FALSE}
+xaringanExtra::style_share_again(share_buttons = c("twitter", "linkedin", "reddit"))
+```
+
+
+```{r search, echo=FALSE}
+xaringanExtra::use_search(show_icon = FALSE)
+```
+
+```{r banner, echo=FALSE}
+xaringanExtra::use_banner(
+  top_left = "Los paquetes van a CRAN",
+  top_right = "https://xiijr.llrs.dev",
+  exclude = "title-slide"
+)
+```
+
+```{r logo, echo=FALSE}
+xaringanExtra::use_logo(
+  image_url = "https://servidor2-ciberehd.upc.es/images/logo.jpeg",
+  position = xaringanExtra::css_position(top = NULL, right = NULL,
+                                         bottom = 0, left = 0)
+)
+```
+
 
 ```{r metathis, echo=FALSE}
-xaringanExtra::use_tile_view()
-xaringanExtra::style_share_again(share_buttons = c("twitter", "linkedin", "reddit"))
 # https://www.garrickadenbuie.com/blog/sharing-xaringan-slides/
 library("metathis")
 meta() |>
@@ -81,6 +95,25 @@ meta() |>
   )
 ```
 
+
+# `r rmarkdown::metadata$title`
+
+.center[`r rmarkdown::metadata$date`]
+
+.right[
+
+### `r rmarkdown::metadata$author`
+[`r icons::fontawesome("square", "regular")`](https://user2021.llrs.dev) 
+[`r icons::fontawesome("github")`](https://github.com/llrs/xiijr/)
+[`r icons::fontawesome("mastodon")`](https://fosstodon.org/Lluis_Revilla) 
+[`r icons::fontawesome("twitter")`](https://twitter.com/Lluis_Revilla)
+]
+
+---
+name:intro
+# Introduction
+
+
 - R es uno de los pocos lenguajes en que los paquetes son revisados.
 - [CRAN](https://cran.r-project.org) es uno de los dos repositorios oficiales.
 - Estoy en grupos de trabajo de [Bioconductor](https://bioconductor.org), en el de [R repository](https://github.com/RConsortium/r-repositories-wg) del [RConsortium](https://www.r-consortium.org/) y en la R contributors de la [R Foundation](https://www.r-project.org/foundation/)
@@ -90,6 +123,13 @@ meta() |>
 ![:scale 40% "Bioconductor logo"](https://www.bioconductor.org/images/logo/svg/bioconductor_logo_rgb.svg)
 ![:scale 20% "rOpenSci"](https://raw.githubusercontent.com/ropensci/logos/master/icon_lettering_color.svg)
 ]
+
+???
+
+Compartir los paquetes en los repositorios una parte muy importante para que otros puedan usar nuestros programas.
+Los repositorios van a la par, todos los programas deben funcionar con los otros programas del repositorio. 
+También hay ciertas comprovaciones con diferentes versiones de R y con diferentes sistemas operativos.
+
 --
 
 
@@ -103,6 +143,15 @@ meta() |>
 
 ]
 
+???
+
+Para ver cómo hacer un paquete a parte del libro [R packages](https://r-pkgs.org), 
+
+Para enviar a CRAN, hay algunas listas, [de CRAN](https://cran.r-project.org/web/packages/submission_checklist.html), [de ThinkR](https://github.com/ThinkR-open/prepare-for-cran), también está mi [sesión en useR2021](https://llrs.dev/talk/user-2021/) que és más sobre qué sucede al enviarlo. 
+El inicio de esta presentación y esa es similar.
+
+Para mantener el paquete en CRAN hay algun contenido en diferentes blogs, cómo por ejemplo del [R-hub](https://blog.r-hub.io/) y de [rOpenSci](https://ropensci.org/blog/).
+Aunque básicamente consisten en seguir todo lo que diga CRAN para mantener los programas allí y cómo hacerlo.
 
 ---
 name:status
@@ -200,6 +249,14 @@ rolling_median |>
        caption = "Lluís Revilla") +
   theme(legend.position = c(0.8, 0.7))
 ```
+
+???
+
+Cuándo se manda un paquete que no está disponible en CRAN pasa por una revisión individual del programa por parte del [equipo de CRAN](https://cran.r-project.org/CRAN_team.htm).
+Este proceso se puede seguir en una [página web](https://r-hub.github.io/cransays/articles/dashboard.html).
+
+Los programas que ya están en CRAN "sólo" se comprueba que pasen los checks, y sus dependencias no den error! 
+Si dan error y sus mantenedores han sido notificados se puede proseguir y seran ellos los encargados de arreglar sus programas si no quieren que sea retirado.
 
 ---
 
@@ -307,6 +364,14 @@ success_submissions + success_dates + plot_layout(guides = "collect") &
   theme(legend.position = "bottom")
 ```
 
+???
+
+El éxito por cada intento decrece con más intentos, pero los paquetes que ya estan en CRAN suelen tener más exito.
+Esto puede ser a que solo hay una revisión automática de los programas y no manual y a que los autores ya tienen experiencia sobre cómo pasar los controles.
+
+En cambio a lo largo del tiempo los porcentage de exitos se ha mantenido más o menos estable.
+Pero con esta presentación, espero que se incremente un poquito más :D
+
 ---
 
 # Evolucion histórica
@@ -373,6 +438,11 @@ packages2 |>
        title = "Tiempo entre armar el paquete y su publicación en CRAN") +
   theme(legend.position = c(0.7, 0.7))
 ```
+
+???
+
+Si se mira a lo largo del tiempo parece que hay épocas en que ha costado más que los paquetes entraran en CRAN o que los autores tardaban más en mandar los paquetes.
+Ahora hay una comprovación que obliga a que el tiempo entre creare el .tar.gz del paquete y la solicitud de inclusión en CRAN sea menor a un mes.
 
 ---
 
@@ -467,6 +537,14 @@ type_updates |>
   theme(legend.position = c(0.2, 0.75), plot.title.position = "plot")
 ```
 
+???
+
+Esto no ha venido por una reducción en los paquetes que se han enviado a CRAN.
+Tal y cómo se puede ver el número de paquetes nuevos se ha ido incrementando hasta hace poco. 
+
+También se puede observar que casi la mitad de los nuevos paquetes es actualizado el mismo año en que se incluye en CRAN. 
+Esto puede ser debido a que hay comprobaciones que sólo se realizan una vez el paquete ya está incluido en CRAN y a que una vez incluido uno tiene más seguridad que los cambios se incluyan. 
+
 ---
 
 # Actualizaciones
@@ -513,7 +591,13 @@ block |>
     theme(legend.position = c(0.4, 0.8), legend.direction = "horizontal")
 ```
 
+???
 
+Cómo se ha visto las actualizaciones en nuevos paquetes es habitual en el mismo año de inclsión.
+Si miramos si ha habido cambios o cuándo es habitual enviar una neva versión, es alrededor de los 5 meses cuando se actualizan los paquetes.
+
+Hay paquetes que llevan más de 200 actualizaciones pero esos son la minoria, la mayoria no llega a 50 versiones diferentes. 
+El único requisito es un número de versión mayor; no tiene porque seguir el sistema de versionado semantico 1.0.0, puede ser 2000.01.01 y pasar al 2022.11.25.
 
 ---
 
@@ -636,7 +720,16 @@ deps_dates |>
             legend.direction = "horizontal")
 ```
 
+???
+
+Si envias un paquete a CRAN no esperes enseguida tener una dependencia, que otros construyan usando tu programa, suele tardar unos 4 años!
+Cada vez más se tiende a depender de paquetes más antiguos y no de más nuevos!
+Esto ayuda a evitar problemas con las comprobaciones automáticas diarias de los paquetes pero recuerda elegir bien tus dependencias.
+Evita aquello que puedas hacer tu, separa lo importante de lo bonito, si puedes incluye solo como dependencia sugerida sino cómo importado y en último recurso cómo dependencia. 
+
 ---
+
+
 
 # Resumen
 
@@ -650,6 +743,20 @@ deps_dates |>
 
 ]
 
+
+???
+
+Preparar bien el paquete antes de enviarlo, hay muchas herramientas, testear, pero segun cómo evitar algunos tests en CRAN. R-hub para comprovar en diferentes sitios.
+CRAN también pone a disposicion de la gente servidores donde testear en windows y macOS con sus mismos ambientes/entornos.
+
+Mirar las opciones, es necesario que esté en CRAN o en un repositorio?
+Si es para méritos académicos quizá solo con publicarlo ya es suficiente si es para que otros lo puedan usar quizá no.
+Pero hay que leer las [normas de inclusión de CRAN](https://cran.r-project.org/web/packages/policies.html), no se avisa cuando cambian así que leerlo bien cada vez que querais mandar una nueva versión.
+Si quieres ser accessible ya está github o si quieres que esten los archivos binarios está [r-universe](https://r-universe.dev/)
+
+Tener un paquete en CRAN implica mantenerlo, a veces no hay que hacer nada, a veces hay cambios en R que obligan a hacer cambios en nuestro código, a veces los tests se hacen más restrictivos para hacer el código mejor. 
+Saber que si alguien depende de nosotros somos "responsables" de los cambios que hagamos y que afecte a sus paquetes.
+
 --
 
 .pull-right[
@@ -660,8 +767,14 @@ deps_dates |>
 [![:scale 50% "CRAN logo"](https://cran.r-project.org/CRANlogo.png)](https://cran.r-project.org)
 ]
 ]
-
 ]
+
+
+???
+
+CRAN es un serivio gratuito, y voluntario iniciado por 3 personas.
+Es un enorme servicio altruista igual que incluir nuevos paquetes.
+Mucha suerte en enviar los paquetes a CRAN! Seguro que tendrás éxito.
 
 --
 
@@ -678,6 +791,11 @@ Lluís Revilla Sancho
 
 ]
 ]
+
+
+???
+
+Seguro que tenes preguntas porque cada paquete es un caso, me las podeis hacer llegar por twitter o mastodon.
 
 
 ```{r qa-checking, eval=FALSE, include=FALSE}

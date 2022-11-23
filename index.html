@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="" xml:lang="">
+<html lang="es" xml:lang="es">
   <head>
     <title>Los paquetes van a CRAN</title>
     <meta charset="utf-8" />
@@ -7,6 +7,14 @@
     <script src="index_files/header-attrs-2.18/header-attrs.js"></script>
     <link href="index_files/remark-css-0.0.1/useR-fonts.css" rel="stylesheet" />
     <link href="index_files/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="index_files/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="index_files/tile-view-0.2.6/tile-view.js"></script>
+    <script src="index_files/mark.js-8.11.1/mark.min.js"></script>
+    <link href="index_files/xaringanExtra-search-0.0.1/search.css" rel="stylesheet" />
+    <script src="index_files/xaringanExtra-search-0.0.1/search.js"></script>
+    <script>window.addEventListener('load', function() { window.xeSearch = new RemarkSearch({"position":"bottom-left","caseSensitive":false,"showIcon":false,"autoSearch":true}) })</script>
+    <link href="index_files/xaringanExtra-banner-0.0.1/banner.css" rel="stylesheet" />
+    <script src="index_files/xaringanExtra-banner-0.0.1/banner.js"></script>
     <meta name="github-repo" content="llrs/xiijr"/>
     <meta name="twitter:title" content="Los paquetes van a CRAN"/>
     <meta name="twitter:description" content="Presentación sobre qué hay que hacer para que los paquetes vayan a CRAN Presentado en las XII Jornadas de R de Córdoba, 2022"/>
@@ -28,21 +36,7 @@
 
 class: title-slide, bottom
 
-# Los paquetes van a CRAN
 
-### [Lluís Revilla Sancho](https://llrs.dev)
-
-[&lt;svg viewBox="0 0 448 512" style="height:1em;position:relative;display:inline-block;top:.1em;" xmlns="http://www.w3.org/2000/svg"&gt;  &lt;path d="M400 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48zm-6 400H54c-3.3 0-6-2.7-6-6V86c0-3.3 2.7-6 6-6h340c3.3 0 6 2.7 6 6v340c0 3.3-2.7 6-6 6z"&gt;&lt;/path&gt;&lt;/svg&gt;](https://user2021.llrs.dev) 
-[&lt;svg viewBox="0 0 496 512" style="height:1em;position:relative;display:inline-block;top:.1em;" xmlns="http://www.w3.org/2000/svg"&gt;  &lt;path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"&gt;&lt;/path&gt;&lt;/svg&gt;](https://github.com/llrs/xiijr/)
-[&lt;svg viewBox="0 0 448 512" style="height:1em;position:relative;display:inline-block;top:.1em;" xmlns="http://www.w3.org/2000/svg"&gt;  &lt;path d="M433 179.11c0-97.2-63.71-125.7-63.71-125.7-62.52-28.7-228.56-28.4-290.48 0 0 0-63.72 28.5-63.72 125.7 0 115.7-6.6 259.4 105.63 289.1 40.51 10.7 75.32 13 103.33 11.4 50.81-2.8 79.32-18.1 79.32-18.1l-1.7-36.9s-36.31 11.4-77.12 10.1c-40.41-1.4-83-4.4-89.63-54a102.54 102.54 0 0 1-.9-13.9c85.63 20.9 158.65 9.1 178.75 6.7 56.12-6.7 105-41.3 111.23-72.9 9.8-49.8 9-121.5 9-121.5zm-75.12 125.2h-46.63v-114.2c0-49.7-64-51.6-64 6.9v62.5h-46.33V197c0-58.5-64-56.6-64-6.9v114.2H90.19c0-122.1-5.2-147.9 18.41-175 25.9-28.9 79.82-30.8 103.83 6.1l11.6 19.5 11.6-19.5c24.11-37.1 78.12-34.8 103.83-6.1 23.71 27.3 18.4 53 18.4 175z"&gt;&lt;/path&gt;&lt;/svg&gt;](https://fosstodon.org/Lluis_Revilla) 
-[&lt;svg viewBox="0 0 512 512" style="height:1em;position:relative;display:inline-block;top:.1em;" xmlns="http://www.w3.org/2000/svg"&gt;  &lt;path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"&gt;&lt;/path&gt;&lt;/svg&gt;](https://twitter.com/Lluis_Revilla)
-
----
-name:intro
-&lt;!-- class: title-slide --&gt;
-&lt;!-- background-image: --&gt;
-
-# Introduction
 
 
 
@@ -56,6 +50,68 @@ name:intro
 --shareagain-pocket: none;
 }</style>
 
+
+
+
+<script>document.addEventListener('DOMContentLoaded',function(){new xeBanner(JSON.parse('{"left":"Los paquetes van a CRAN","right":"https://xiijr.llrs.dev","exclude":["title-slide"],"position":"top"}'))})</script>
+<script>document.addEventListener('DOMContentLoaded',function(){new xeBanner(JSON.parse('{"exclude":["title-slide"],"position":"bottom"}'))})</script>
+
+<div>
+<style type="text/css">.xaringan-extra-logo {
+width: 110px;
+height: 128px;
+z-index: 0;
+background-image: url(https://servidor2-ciberehd.upc.es/images/logo.jpeg);
+background-size: contain;
+background-repeat: no-repeat;
+position: absolute;
+bottom:0;left:0;
+}
+</style>
+<script>(function () {
+  let tries = 0
+  function addLogo () {
+    if (typeof slideshow === 'undefined') {
+      tries += 1
+      if (tries < 10) {
+        setTimeout(addLogo, 100)
+      }
+    } else {
+      document.querySelectorAll('.remark-slide-content:not(.title-slide):not(.inverse):not(.hide_logo)')
+        .forEach(function (slide) {
+          const logo = document.createElement('div')
+          logo.classList = 'xaringan-extra-logo'
+          logo.href = null
+          slide.appendChild(logo)
+        })
+    }
+  }
+  document.addEventListener('DOMContentLoaded', addLogo)
+})()</script>
+</div>
+
+
+
+
+
+# Los paquetes van a CRAN
+
+.center[2022/11/25]
+
+.right[
+
+### [Lluís Revilla Sancho](https://llrs.dev)
+[&lt;svg viewBox="0 0 448 512" style="height:1em;position:relative;display:inline-block;top:.1em;" xmlns="http://www.w3.org/2000/svg"&gt;  &lt;path d="M400 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48zm-6 400H54c-3.3 0-6-2.7-6-6V86c0-3.3 2.7-6 6-6h340c3.3 0 6 2.7 6 6v340c0 3.3-2.7 6-6 6z"&gt;&lt;/path&gt;&lt;/svg&gt;](https://user2021.llrs.dev) 
+[&lt;svg viewBox="0 0 496 512" style="height:1em;position:relative;display:inline-block;top:.1em;" xmlns="http://www.w3.org/2000/svg"&gt;  &lt;path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"&gt;&lt;/path&gt;&lt;/svg&gt;](https://github.com/llrs/xiijr/)
+[&lt;svg viewBox="0 0 448 512" style="height:1em;position:relative;display:inline-block;top:.1em;" xmlns="http://www.w3.org/2000/svg"&gt;  &lt;path d="M433 179.11c0-97.2-63.71-125.7-63.71-125.7-62.52-28.7-228.56-28.4-290.48 0 0 0-63.72 28.5-63.72 125.7 0 115.7-6.6 259.4 105.63 289.1 40.51 10.7 75.32 13 103.33 11.4 50.81-2.8 79.32-18.1 79.32-18.1l-1.7-36.9s-36.31 11.4-77.12 10.1c-40.41-1.4-83-4.4-89.63-54a102.54 102.54 0 0 1-.9-13.9c85.63 20.9 158.65 9.1 178.75 6.7 56.12-6.7 105-41.3 111.23-72.9 9.8-49.8 9-121.5 9-121.5zm-75.12 125.2h-46.63v-114.2c0-49.7-64-51.6-64 6.9v62.5h-46.33V197c0-58.5-64-56.6-64-6.9v114.2H90.19c0-122.1-5.2-147.9 18.41-175 25.9-28.9 79.82-30.8 103.83 6.1l11.6 19.5 11.6-19.5c24.11-37.1 78.12-34.8 103.83-6.1 23.71 27.3 18.4 53 18.4 175z"&gt;&lt;/path&gt;&lt;/svg&gt;](https://fosstodon.org/Lluis_Revilla) 
+[&lt;svg viewBox="0 0 512 512" style="height:1em;position:relative;display:inline-block;top:.1em;" xmlns="http://www.w3.org/2000/svg"&gt;  &lt;path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"&gt;&lt;/path&gt;&lt;/svg&gt;](https://twitter.com/Lluis_Revilla)
+]
+
+---
+name:intro
+# Introduction
+
+
 - R es uno de los pocos lenguajes en que los paquetes son revisados.
 - [CRAN](https://cran.r-project.org) es uno de los dos repositorios oficiales.
 - Estoy en grupos de trabajo de [Bioconductor](https://bioconductor.org), en el de [R repository](https://github.com/RConsortium/r-repositories-wg) del [RConsortium](https://www.r-consortium.org/) y en la R contributors de la [R Foundation](https://www.r-project.org/foundation/)
@@ -65,6 +121,13 @@ name:intro
 ![:scale 40% "Bioconductor logo"](https://www.bioconductor.org/images/logo/svg/bioconductor_logo_rgb.svg)
 ![:scale 20% "rOpenSci"](https://raw.githubusercontent.com/ropensci/logos/master/icon_lettering_color.svg)
 ]
+
+???
+
+Compartir los paquetes en los repositorios una parte muy importante para que otros puedan usar nuestros programas.
+Los repositorios van a la par, todos los programas deben funcionar con los otros programas del repositorio. 
+También hay ciertas comprovaciones con diferentes versiones de R y con diferentes sistemas operativos.
+
 --
 
 
@@ -78,6 +141,15 @@ name:intro
 
 ]
 
+???
+
+Para ver cómo hacer un paquete a parte del libro [R packages](https://r-pkgs.org), 
+
+Para enviar a CRAN, hay algunas listas, [de CRAN](https://cran.r-project.org/web/packages/submission_checklist.html), [de ThinkR](https://github.com/ThinkR-open/prepare-for-cran), también está mi [sesión en useR2021](https://llrs.dev/talk/user-2021/) que és más sobre qué sucede al enviarlo. 
+El inicio de esta presentación y esa es similar.
+
+Para mantener el paquete en CRAN hay algun contenido en diferentes blogs, cómo por ejemplo del [R-hub](https://blog.r-hub.io/) y de [rOpenSci](https://ropensci.org/blog/).
+Aunque básicamente consisten en seguir todo lo que diga CRAN para mantener los programas allí y cómo hacerlo.
 
 ---
 name:status
@@ -86,6 +158,14 @@ name:status
 
 &lt;img src="index_files/figure-html/cdh-1.png" width="792" style="display: block; margin: auto;" /&gt;
 
+???
+
+Cuándo se manda un paquete que no está disponible en CRAN pasa por una revisión individual del programa por parte del [equipo de CRAN](https://cran.r-project.org/CRAN_team.htm).
+Este proceso se puede seguir en una [página web](https://r-hub.github.io/cransays/articles/dashboard.html).
+
+Los programas que ya están en CRAN "sólo" se comprueba que pasen los checks, y sus dependencias no den error! 
+Si dan error y sus mantenedores han sido notificados se puede proseguir y seran ellos los encargados de arreglar sus programas si no quieren que sea retirado.
+
 ---
 
 name:success-submissions
@@ -93,11 +173,24 @@ name:success-submissions
 
 &lt;img src="index_files/figure-html/cran_success-1.png" alt="On the left a bar plot with packages submissions to CRAN on the x axis and on the vertical axis the number of pacakges. The bars are colored by if they are accepted or not. It is also split by new packages and updated pacakges. More new pacakges are not accepted on the first try than updates, but on resubmissions they are accepted. The plot on the right shows the acceptance rate of CRAN for the range of dates from 2020/09 to 2021/06. Two lines with one for new submissions which shows a consistend rate around 81% and package updates is between 85% and 95% (until the time series get to close for the review to be finished)." width="792" style="display: block; margin: auto;" /&gt;
 
+???
+
+El éxito por cada intento decrece con más intentos, pero los paquetes que ya estan en CRAN suelen tener más exito.
+Esto puede ser a que solo hay una revisión automática de los programas y no manual y a que los autores ya tienen experiencia sobre cómo pasar los controles.
+
+En cambio a lo largo del tiempo los porcentage de exitos se ha mantenido más o menos estable.
+Pero con esta presentación, espero que se incremente un poquito más :D
+
 ---
 
 # Evolucion histórica
 
 &lt;img src="index_files/figure-html/ev-historica-1.png" alt="Modelizaje del tiempo entre contruir el paquete y que sea publicado en CRAN." width="792" style="display: block; margin: auto;" /&gt;
+
+???
+
+Si se mira a lo largo del tiempo parece que hay épocas en que ha costado más que los paquetes entraran en CRAN o que los autores tardaban más en mandar los paquetes.
+Ahora hay una comprovación que obliga a que el tiempo entre creare el .tar.gz del paquete y la solicitud de inclusión en CRAN sea menor a un mes.
 
 ---
 
@@ -109,6 +202,14 @@ name:success-submissions
 # Los nuevos paquetes
 
 &lt;img src="index_files/figure-html/nuevos-1.png" width="792" style="display: block; margin: auto;" /&gt;
+
+???
+
+Esto no ha venido por una reducción en los paquetes que se han enviado a CRAN.
+Tal y cómo se puede ver el número de paquetes nuevos se ha ido incrementando hasta hace poco. 
+
+También se puede observar que casi la mitad de los nuevos paquetes es actualizado el mismo año en que se incluye en CRAN. 
+Esto puede ser debido a que hay comprobaciones que sólo se realizan una vez el paquete ya está incluido en CRAN y a que una vez incluido uno tiene más seguridad que los cambios se incluyan. 
 
 ---
 
@@ -122,7 +223,13 @@ El 75% de los paquetes de CRAN han tenido alguna
 
 &lt;img src="index_files/figure-html/time_version-1.png" width="792" style="display: block; margin: auto;" /&gt;
 
+???
 
+Cómo se ha visto las actualizaciones en nuevos paquetes es habitual en el mismo año de inclsión.
+Si miramos si ha habido cambios o cuándo es habitual enviar una neva versión, es alrededor de los 5 meses cuando se actualizan los paquetes.
+
+Hay paquetes que llevan más de 200 actualizaciones pero esos son la minoria, la mayoria no llega a 50 versiones diferentes. 
+El único requisito es un número de versión mayor; no tiene porque seguir el sistema de versionado semantico 1.0.0, puede ser 2000.01.01 y pasar al 2022.11.25.
 
 ---
 
@@ -137,7 +244,16 @@ El 75% de los paquetes de CRAN han tenido alguna
 
 &lt;img src="index_files/figure-html/plot-dependencias-1.png" width="792" style="display: block; margin: auto;" /&gt;
 
+???
+
+Si envias un paquete a CRAN no esperes enseguida tener una dependencia, que otros construyan usando tu programa, suele tardar unos 4 años!
+Cada vez más se tiende a depender de paquetes más antiguos y no de más nuevos!
+Esto ayuda a evitar problemas con las comprobaciones automáticas diarias de los paquetes pero recuerda elegir bien tus dependencias.
+Evita aquello que puedas hacer tu, separa lo importante de lo bonito, si puedes incluye solo como dependencia sugerida sino cómo importado y en último recurso cómo dependencia. 
+
 ---
+
+
 
 # Resumen
 
@@ -151,6 +267,20 @@ El 75% de los paquetes de CRAN han tenido alguna
 
 ]
 
+
+???
+
+Preparar bien el paquete antes de enviarlo, hay muchas herramientas, testear, pero segun cómo evitar algunos tests en CRAN. R-hub para comprovar en diferentes sitios.
+CRAN también pone a disposicion de la gente servidores donde testear en windows y macOS con sus mismos ambientes/entornos.
+
+Mirar las opciones, es necesario que esté en CRAN o en un repositorio?
+Si es para méritos académicos quizá solo con publicarlo ya es suficiente si es para que otros lo puedan usar quizá no.
+Pero hay que leer las [normas de inclusión de CRAN](https://cran.r-project.org/web/packages/policies.html), no se avisa cuando cambian así que leerlo bien cada vez que querais mandar una nueva versión.
+Si quieres ser accessible ya está github o si quieres que esten los archivos binarios está [r-universe](https://r-universe.dev/)
+
+Tener un paquete en CRAN implica mantenerlo, a veces no hay que hacer nada, a veces hay cambios en R que obligan a hacer cambios en nuestro código, a veces los tests se hacen más restrictivos para hacer el código mejor. 
+Saber que si alguien depende de nosotros somos "responsables" de los cambios que hagamos y que afecte a sus paquetes.
+
 --
 
 .pull-right[
@@ -161,8 +291,14 @@ El 75% de los paquetes de CRAN han tenido alguna
 [![:scale 50% "CRAN logo"](https://cran.r-project.org/CRANlogo.png)](https://cran.r-project.org)
 ]
 ]
-
 ]
+
+
+???
+
+CRAN es un serivio gratuito, y voluntario iniciado por 3 personas.
+Es un enorme servicio altruista igual que incluir nuevos paquetes.
+Mucha suerte en enviar los paquetes a CRAN! Seguro que tendrás éxito.
 
 --
 
@@ -179,6 +315,11 @@ Lluís Revilla Sancho
 
 ]
 ]
+
+
+???
+
+Seguro que tenes preguntas porque cada paquete es un caso, me las podeis hacer llegar por twitter o mastodon.
 
 
 
