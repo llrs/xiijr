@@ -121,7 +121,7 @@ name:intro
 .center[
 [![:scale 15% "CRAN logo"](https://cran.r-project.org/CRANlogo.svg)](https://cran.r-project.org)
 ![:scale 40% "Bioconductor logo"](https://www.bioconductor.org/images/logo/svg/bioconductor_logo_rgb.svg)
-![:scale 20% "rOpenSci"](https://raw.githubusercontent.com/ropensci/logos/master/icon_lettering_color.svg)
+![:scale 20% "rOpenSci logo"](https://raw.githubusercontent.com/ropensci/logos/master/icon_lettering_color.svg)
 ]
 
 ???
@@ -135,7 +135,7 @@ También hay ciertas comprovaciones con diferentes versiones de R y con diferent
 
 .center[
 
-0. Hay [mucho contenido](https://r-pkgs.org) sobre [cómo hacer](https://hilaryparker.com/2014/04/29/writing-an-r-package-from-scratch/) un [paquete](https://kbroman.org/pkg_primer/). 
+- Hay [mucho contenido](https://r-pkgs.org) sobre [cómo hacer](https://hilaryparker.com/2014/04/29/writing-an-r-package-from-scratch/) un [paquete](https://kbroman.org/pkg_primer/). 
 
 1. [Enviar tu paquete a CRAN](https://search.r-project.org/CRAN/refmans/devtools/html/release.html)
    
@@ -161,6 +161,10 @@ name:status
 # Estado actual
 
 ```{r cdh}
+#| fig.alt: "Grafica que muestra la mediana por 45 días de las carpetas tests y 
+#| new. En 2020 el tiempo medio erade mas de 100 horas pero ahora está por debajo
+#|  de 50h para los nuevos paquetes. Para las actualizaciones el tiempo medio es 
+#|  cercano a 2 horas."
 if (!file.exists("output/cdh.RDS")) {
   cdh <- cransays::download_history()
   saveRDS(cdh, "output/cdh.RDS")
@@ -241,7 +245,7 @@ rolling_median |>
     geom_hline(aes(yintercept = time, col = new), data = . %>% group_by(new) %>% summarise(time = median(m_rolling, na.rm = TRUE), .groups = "drop"),
                linetype = "dashed", alpha = 0.5) +
   coord_cartesian(ylim = c(0, NA)) +
-  scale_color_viridis_d() +
+  scale_color_viridis_d(option = "turbo") +
   scale_x_date(expand = expansion()) +
   scale_y_continuous(expand = expansion()) +
   scale_linewidth(breaks = c(10, 50, 100, 150)) +
@@ -265,7 +269,14 @@ Si dan error y sus mantenedores han sido notificados se puede proseguir y seran 
 name:success-submissions
 # Exitoso?
 
-```{r cran_success, fig.alt="On the left a bar plot with packages submissions to CRAN on the x axis and on the vertical axis the number of pacakges. The bars are colored by if they are accepted or not. It is also split by new packages and updated pacakges. More new pacakges are not accepted on the first try than updates, but on resubmissions they are accepted. The plot on the right shows the acceptance rate of CRAN for the range of dates from 2020/09 to 2021/06. Two lines with one for new submissions which shows a consistend rate around 81% and package updates is between 85% and 95% (until the time series get to close for the review to be finished)."}
+```{r cran_success}
+#| fig.alt: "A la izquierda un gráfico de linías con la tasa de exito por 
+#| solicitudes de los nuevos paquetes y de los que son actualizaciones.
+#| Empieza por el 75% y 90%, respectivamente, y diminuyen hasta cerca del 25%.
+#| A la derecha un gráfico de linías con el ratio de aceptación medio cada 45 días.
+#| En los nuevos paquetes está mayoritariamente entre el 70% y el 80% y en 
+#| las actualizaciones suele estar cercano al 90%. En ambas gráficas el grueso 
+#| de la línea indica el número de paquetes."
 approval_dates <- function(start, end, package, li) {
   dates <- li[[package]]
   dates <- dates[!is.na(dates)] # Too old packages don't have date
@@ -327,7 +338,7 @@ success_submissions <- ap |>
        linewidth = "Paquetes") +
   scale_y_continuous(expand = expansion(), limits = c(0, 1), labels = scales::percent) +
   scale_x_continuous(expand = expansion(), limits = c(1, 75)) +
-  scale_color_viridis_d() +
+  scale_color_viridis_d(option = "turbo") +
   scale_linewidth_continuous(trans = "log10", breaks = c(1, 10, 100, 1000), 
                   labels = c("1", "10", "100", "1000"), limits = c(1, 1000)) +
   theme(legend.position = "bottom")
@@ -351,7 +362,7 @@ success_dates <- ap0 |>
   scale_y_continuous(expand = expansion(), labels = scales::percent) +
   scale_x_datetime(date_labels = "%y/%m", date_breaks = "2 month", minor_breaks = NULL,
                    expand = expansion()) +
-  scale_color_viridis_d() +
+  scale_color_viridis_d(option = "turbo") +
   scale_linewidth(trans = "log10", breaks = c(1, 10, 100, 1000), 
                   labels = c("1", "10", "100", "1000"), limits = c(1, 1000)) +
   coord_cartesian(ylim = c(0.6, 1)) +
@@ -379,7 +390,7 @@ Pero con esta presentación, espero que se incremente un poquito más :D
 # Evolucion histórica
 
 ```{r ev-historica}
-#| fig.alt = "Modelizaje del tiempo entre contruir el paquete y que sea publicado en CRAN."
+#| fig.alt: "Modelizaje del tiempo entre contruir el paquete y que sea publicado en CRAN."
 
 if (!file.exists("output/archive.RDS")) {
   archive <- tools:::CRAN_archive_db()
@@ -431,7 +442,7 @@ packages2 |>
   scale_y_continuous(expand = expansion()) +
   scale_x_date(date_breaks = "2 years", date_labels = "%Y", 
                expand = expansion(add = 0.5)) +
-  scale_color_viridis_d() +
+  scale_color_viridis_d(option = "turbo") +
   coord_cartesian(ylim =  c(0, NA)) +
   labs(y = "Tiempo en procesar (días)", 
        x = element_blank(),
@@ -523,6 +534,9 @@ type_updates <- all_packages2 |>
 # Los nuevos paquetes
 
 ```{r nuevos}
+#| fig.alt: "Número de nuevos paquetes incluidos en CRAN dividido por si son 
+#| nuevos y si son nuevos pero se han actualizado el mismo año. Más o menos el 
+#| 50% de los paquetes se actualiza antes de que acabe el año."
 type_updates |> 
   filter(type != "Actualización") |> 
   ggplot() +
@@ -535,7 +549,7 @@ type_updates |>
        x = element_blank(),
        y = element_blank(),
        fill = "Tipo") +
-  scale_fill_viridis_d() +
+  scale_fill_viridis_d(option = "turbo") +
   theme(legend.position = c(0.2, 0.75), plot.title.position = "plot")
 ```
 
@@ -565,6 +579,10 @@ El `r scales::percent(1-a$p)` de los paquetes de CRAN han tenido alguna
 --
 
 ```{r time_version}
+#| fig.alt: "Gràfica que representa el tiempo desde que los paquetes son inclidos
+#|  en CRAN hasta que se publica una nueva versión (se muestran hasta 6 
+#|  actualizaciones). El tiempo suele estar cerca de las 20 semanas para sacar una
+#|   nueva versión, siendo la segunda versión del programa un poquito antes."
 block <- all_packages2 |> 
   filter(release != 1) |> 
   group_by(month = floor_date(date, "month"),
@@ -583,7 +601,7 @@ block |>
   scale_y_continuous(expand = expansion(),
                      sec.axis = sec_axis( ~ ./52, name = "Años"),
                      limits = c(0, NA)) +
-  scale_color_viridis_d() +
+  scale_color_viridis_d(option = "turbo") +
   labs(x = element_blank(),
        y = "Tiempo medio desde la anterior actualización (semanas)",
        title = "Velocidad de las actualizaciones",
@@ -698,6 +716,11 @@ l <- lapply(direct_dep, dates_deps, dates, base_packages)
 # Las dependencias!
 
 ```{r plot-dependencias}
+#| fig.alt: "Gráfico que muestra los años entre que se ha publicado un paquete y 
+#| el año de la primera publicación de sus dependencias, tanto el más joven, cómo 
+#| la mayor, así como la edad media. En general ahora se tiende a usar paquetes 
+#| más viejos y no se tiende a depender de paquetes alrededor de los 4 años de 
+#| su primera publicación."
 # First date of release of a package and current date of publication of packages
 deps_dates <- do.call("rbind", l) 
 deps_dates$package <- names(direct_dep)
@@ -713,7 +736,7 @@ deps_dates |>
   geom_abline(slope = 1/52, intercept = 0) +
   scale_y_continuous(sec.axis = dup_axis(), limits = c(0, NA), expand = expansion()) +
   scale_x_date(expand = expansion()) +
-  scale_color_viridis_d() +
+  scale_color_viridis_d(option = "turbo") +
   labs(x = element_blank(),
        y = "Años de diferencia",
        col = "Dependencia",

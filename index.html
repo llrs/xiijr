@@ -120,7 +120,7 @@ name:intro
 .center[
 [![:scale 15% "CRAN logo"](https://cran.r-project.org/CRANlogo.svg)](https://cran.r-project.org)
 ![:scale 40% "Bioconductor logo"](https://www.bioconductor.org/images/logo/svg/bioconductor_logo_rgb.svg)
-![:scale 20% "rOpenSci"](https://raw.githubusercontent.com/ropensci/logos/master/icon_lettering_color.svg)
+![:scale 20% "rOpenSci logo"](https://raw.githubusercontent.com/ropensci/logos/master/icon_lettering_color.svg)
 ]
 
 ???
@@ -134,9 +134,9 @@ También hay ciertas comprovaciones con diferentes versiones de R y con diferent
 
 .center[
 
-0. Hay mucho contenido sobre cómo hacer un paquete 
+- Hay [mucho contenido](https://r-pkgs.org) sobre [cómo hacer](https://hilaryparker.com/2014/04/29/writing-an-r-package-from-scratch/) un [paquete](https://kbroman.org/pkg_primer/). 
 
-1. Enviar tu paquete a CRAN
+1. [Enviar tu paquete a CRAN](https://search.r-project.org/CRAN/refmans/devtools/html/release.html)
    
 2. Mantener el paquete en CRAN
 
@@ -146,7 +146,9 @@ También hay ciertas comprovaciones con diferentes versiones de R y con diferent
 
 Para ver cómo hacer un paquete a parte del libro [R packages](https://r-pkgs.org), 
 
-Para enviar a CRAN, hay algunas listas, [de CRAN](https://cran.r-project.org/web/packages/submission_checklist.html), [de ThinkR](https://github.com/ThinkR-open/prepare-for-cran), también está mi [sesión en useR2021](https://llrs.dev/talk/user-2021/) que és más sobre qué sucede al enviarlo. 
+Para enviar a CRAN, hay algunas listas, [de CRAN](https://cran.r-project.org/web/packages/submission_checklist.html), [de ThinkR](https://github.com/ThinkR-open/prepare-for-cran), también está mi [sesión en useR2021](https://llrs.dev/talk/user-2021/) que és más sobre qué sucede al enviarlo.
+Para enviarlo en sí, se [puede hacer desde aquí](https://cran.r-project.org/submit.html), aunque se puede enviar mediante [`devtools::release()`](https://search.r-project.org/CRAN/refmans/devtools/html/release.html)
+
 El inicio de esta presentación y esa es similar.
 
 Para mantener el paquete en CRAN hay algun contenido en diferentes blogs, cómo por ejemplo del [R-hub](https://blog.r-hub.io/) y de [rOpenSci](https://ropensci.org/blog/).
@@ -157,7 +159,7 @@ name:status
 
 # Estado actual
 
-&lt;img src="index_files/figure-html/cdh-1.png" width="792" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/cdh-1.png" alt="Grafica que muestra la mediana por 45 días de las carpetas tests y new. En 2020 el tiempo medio erade mas de 100 horas pero ahora está por debajo de 50h para los nuevos paquetes. Para las actualizaciones el tiempo medio es cercano a 2 horas." width="792" style="display: block; margin: auto;" /&gt;
 
 ???
 
@@ -172,7 +174,7 @@ Si dan error y sus mantenedores han sido notificados se puede proseguir y seran 
 name:success-submissions
 # Exitoso?
 
-&lt;img src="index_files/figure-html/cran_success-1.png" alt="On the left a bar plot with packages submissions to CRAN on the x axis and on the vertical axis the number of pacakges. The bars are colored by if they are accepted or not. It is also split by new packages and updated pacakges. More new pacakges are not accepted on the first try than updates, but on resubmissions they are accepted. The plot on the right shows the acceptance rate of CRAN for the range of dates from 2020/09 to 2021/06. Two lines with one for new submissions which shows a consistend rate around 81% and package updates is between 85% and 95% (until the time series get to close for the review to be finished)." width="792" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/cran_success-1.png" alt="A la izquierda un gráfico de linías con la tasa de exito por solicitudes de los nuevos paquetes y de los que son actualizaciones. Empieza por el 75% y 90%, respectivamente, y diminuyen hasta cerca del 25%. A la derecha un gráfico de linías con el ratio de aceptación medio cada 45 días. En los nuevos paquetes está mayoritariamente entre el 70% y el 80% y en las actualizaciones suele estar cercano al 90%. En ambas gráficas el grueso de la línea indica el número de paquetes." width="792" style="display: block; margin: auto;" /&gt;
 
 ???
 
@@ -202,7 +204,7 @@ Ahora hay una comprovación que obliga a que el tiempo entre creare el .tar.gz d
 
 # Los nuevos paquetes
 
-&lt;img src="index_files/figure-html/nuevos-1.png" width="792" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/nuevos-1.png" alt="Número de nuevos paquetes incluidos en CRAN dividido por si son nuevos y si son nuevos pero se han actualizado el mismo año. Más o menos el 50% de los paquetes se actualiza antes de que acabe el año." width="792" style="display: block; margin: auto;" /&gt;
 
 ???
 
@@ -222,7 +224,7 @@ El 75% de los paquetes de CRAN han tenido alguna
 
 --
 
-&lt;img src="index_files/figure-html/time_version-1.png" width="792" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/time_version-1.png" alt="Gràfica que representa el tiempo desde que los paquetes son inclidos en CRAN hasta que se publica una nueva versión (se muestran hasta 6 actualizaciones). El tiempo suele estar cerca de las 20 semanas para sacar una nueva versión, siendo la segunda versión del programa un poquito antes." width="792" style="display: block; margin: auto;" /&gt;
 
 ???
 
@@ -243,7 +245,7 @@ El único requisito es un número de versión mayor; no tiene porque seguir el s
 
 # Las dependencias!
 
-&lt;img src="index_files/figure-html/plot-dependencias-1.png" width="792" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/plot-dependencias-1.png" alt="Gráfico que muestra los años entre que se ha publicado un paquete y el año de la primera publicación de sus dependencias, tanto el más joven, cómo la mayor, así como la edad media. En general ahora se tiende a usar paquetes más viejos y no se tiende a depender de paquetes alrededor de los 4 años de su primera publicación." width="792" style="display: block; margin: auto;" /&gt;
 
 ???
 
