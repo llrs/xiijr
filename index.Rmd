@@ -79,14 +79,13 @@ meta() |>
   meta_social(
     title = "Los paquetes van a CRAN",
     description = paste(
-      "Presentación sobre qué hay que hacer para que los paquetes vayan a CRAN",
+      "Presentación sobre Los paquetes van a CRAN.",
       "Presentado en las XII Jornadas de R de Córdoba, 2022"
     ),
     url = "https://xiijr.llrs.dev",
-    # image = "https://xiijr.llrs.dev/index_files/figure-html/title_slide_screenshot.png",
+    image = "https://xiijr.llrs.dev/img/portada.png",
     image_alt = paste(
-      "Image of the first slide for Reviewing packages; how does it work?", 
-      "On the background a plot with the submissions to CRAN, horizontal axis the date, vertical axis the submissions on CRAN each line is a package on the submission queue. It shows a continuous increase on packages submitted (except some pauses).", 
+      "Image de la presentación Los paquetes van a CRAN con una persona llevando un paquete.", 
       "Presentado en las XII Jornadas de R de Córdoba, 2022 por Lluís Revilla"
     ),
     og_type = "website",
